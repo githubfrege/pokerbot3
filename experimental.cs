@@ -141,8 +141,7 @@ namespace pokerbot3
         }
         public static void getFields(ulong bf, out int solo, out ulong ranksField, out bool flush)
         {
-            solo = getSolo(bf);
-
+            solo = 0;
             ranksField = 0;
             flush = false;
             Dictionary<int, int> instances = new Dictionary<int, int>();
@@ -151,8 +150,9 @@ namespace pokerbot3
                 int flushIdx = 0;
                 for (int j = 2; j <= 14; j++)
                 {
-                    if ((solo & (1 << j)) > 0)            //if ((bf & (1UL << (j + (15 * i)))) != 0)
+                    if ((bf &(1UL << (j+ (15 * i)))) > 0)            //if ((bf & (1UL << (j + (15 * i)))) != 0)
                     {
+                        solo |= (1 << j);
                         flushIdx++;
                         if (flushIdx == 5)
                         {
@@ -176,7 +176,8 @@ namespace pokerbot3
 
                 }
             }
-            ranksField = ranksField >> 1;
+            Console.WriteLine(Convert.ToString(solo, toBase: 2));
+
 
         }
         public static IEnumerable<ulong> ToIEnum(this ulong num)
@@ -356,8 +357,8 @@ namespace pokerbot3
 
             int[] holeCardSuits2 = new int[] { 0, 0 };
             int[] holeCardRanks2 = new int[] { 10, 12 };
-            int[] tableCardSuits2 = new int[] { 0, 0, 1, };
-            int[] tableCardRanks2 = new int[] { 2, 7, 4, };
+            int[] tableCardSuits2 = new int[] { 0, 0, 1,3,2 };
+            int[] tableCardRanks2 = new int[] { 2, 7, 4, 10,14 };
             List<KeyValuePair<int, int>> myHoleCards2 = new List<KeyValuePair<int, int>>();
             List<KeyValuePair<int, int>> tableCards2 = new List<KeyValuePair<int, int>>();
             for (int i = 0; i < 2; i++)
@@ -365,13 +366,15 @@ namespace pokerbot3
                 myHoleCards2.Add(new KeyValuePair<int, int>(holeCardRanks2[i], holeCardSuits2[i]));
             }
 
-            for (int i = 0; i < 3; i++)
+            for (int i = 0; i < 5; i++)
             {
                 tableCards2.Add(new KeyValuePair<int, int>(tableCardRanks2[i], tableCardSuits2[i]));
             }
-            Console.WriteLine(GetOdds(myHoleCards, tableCards));
+            /*Console.WriteLine(GetOdds(myHoleCards, tableCards));
             Console.WriteLine("new");
-            Console.WriteLine(GetOdds(myHoleCards2, tableCards2));
+            Console.WriteLine(GetOdds(myHoleCards2, tableCards2));*/
+            getFields(parseAsBitField(tableCards2), out int solo, out ulong ranksField, out bool flush);
+            Console.WriteLine(Convert.ToString((long)ranksField, toBase: 2));
          
         }
     }
